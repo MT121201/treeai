@@ -1,7 +1,7 @@
 det_tree/
 dataset/
 runs/
-
+tmp_vis/
 # Ignore Python cache and virtual environment
 __pycache__/
 *.pyc
