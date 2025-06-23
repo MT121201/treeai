@@ -48,5 +48,5 @@ def analyze_yolo_labels(label_dir, image_size=640):
               f"{np.min(sizes):10.2f} {np.mean(sizes):10.2f} {np.max(sizes):10.2f}")
 
 # Example usage:
-analyze_yolo_labels("dataset/merged_seg_dataset/labels/train")
-analyze_yolo_labels("dataset/merged_seg_dataset/labels/val")
+analyze_yolo_labels("/home/a3ilab01/treeai/det_tree/34_RGB_ObjDet_640_pL/labels/train")
+analyze_yolo_labels("det_tree/34_RGB_ObjDet_640_pL/labels/val")
