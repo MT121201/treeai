@@ -1,85 +1,79 @@
 from pathlib import Path
+from create_annotations import (
+    create_image_annotation,
+    create_annotation_from_yolo_format,
+    create_annotation_from_yolo_results_format,
+)
 import cv2
 import argparse
 import json
 import numpy as np
 import imagesize
-from create_annotations import (
-    create_image_annotation,
-    create_annotation_from_yolo_format,
-    create_annotation_from_yolo_results_format,
-    coco_format,
-)
 
-YOLO_DARKNET_SUB_DIR = "YOLO_darknet"
+# Define COCO skeleton
+coco_format = {
+    "info": {
+        "description": "Tree AI Dataset",
+        "version": "1.0",
+        "year": 2025,
+        "contributor": "MT1212",
+        "date_created": "2025-06-23"
+    },
+    "images": [],
+    "annotations": [],
+    "categories": []
+}
 
-CATEGORY_IDS = [
-    3, 5, 6, 9, 11, 12, 13, 15, 17, 20,
-    24, 25, 26, 30, 35, 36, 40, 48, 49, 50,
-    51, 52, 53, 54, 56, 57, 58, 59, 60, 61
+# Match these exactly to the YOLO label class index (0-based)
+classes = [
+    "cls_3", "cls_5", "cls_6", "cls_9", "cls_11", "cls_12", "cls_13",
+    "cls_15", "cls_17", "cls_20", "cls_24", "cls_25", "cls_26", "cls_30",
+    "cls_35", "cls_36", "cls_40", "cls_48", "cls_49", "cls_50", "cls_51",
+    "cls_52", "cls_53", "cls_54", "cls_56", "cls_57", "cls_58", "cls_59",
+    "cls_60", "cls_61"
 ]
-classes = [f"cls_{i}" for i in CATEGORY_IDS]
-
 
 def get_images_info_and_annotations(opt):
     path = Path(opt.path)
     annotations = []
     images_annotations = []
-    if path.is_dir():
-        file_paths = sorted(path.rglob("*.jpg")) + sorted(path.rglob("*.jpeg")) + sorted(path.rglob("*.png"))
-    else:
-        with open(path, "r") as fp:
-            file_paths = [Path(line.strip()) for line in fp.readlines()]
-
     image_id = 0
     annotation_id = 1
 
+    file_paths = sorted(path.rglob("*.png")) + sorted(path.rglob("*.jpg")) + sorted(path.rglob("*.jpeg"))
+
     for file_path in file_paths:
-        print("\rProcessing " + str(image_id) + " ...", end='')
-
+        print(f"\rProcessing {file_path.name}", end='')
         w, h = imagesize.get(str(file_path))
-        image_annotation = create_image_annotation(
-            file_path=file_path, width=w, height=h, image_id=image_id
-        )
-        images_annotations.append(image_annotation)
+        images_annotations.append(create_image_annotation(file_path, w, h, image_id))
 
-        label_file_name = f"{file_path.stem}.txt"
-        annotations_path = file_path.parent / (YOLO_DARKNET_SUB_DIR if opt.yolo_subdir else '') / label_file_name
+        label_path = file_path.with_suffix(".txt")
+        if label_path.exists():
+            with open(label_path, "r") as f:
+                lines = f.readlines()
 
-        if annotations_path.exists():
-            with open(str(annotations_path), "r") as label_file:
-                label_read_line = label_file.readlines()
-
-            for line1 in label_read_line:
-                parts = line1.strip().split()
-                if not parts or len(parts) < 5:
+            for line in lines:
+                items = line.strip().split()
+                if len(items) < 5:
                     continue
-                original_class_id = int(parts[0])
-                if original_class_id not in CATEGORY_IDS:
+
+                class_id = int(items[0])
+                if class_id >= len(classes):
                     continue
-                category_id = CATEGORY_IDS.index(original_class_id) + 1
 
-                x_center, y_center, width, height = map(float, parts[1:5])
-                float_x_center = w * x_center
-                float_y_center = h * y_center
-                float_width = w * width
-                float_height = h * height
+                x, y, bw, bh = map(float, items[1:5])
+                abs_x = w * x
+                abs_y = h * y
+                abs_bw = w * bw
+                abs_bh = h * bh
+                x_min = int(abs_x - abs_bw / 2)
+                y_min = int(abs_y - abs_bh / 2)
 
-                min_x = int(float_x_center - float_width / 2)
-                min_y = int(float_y_center - float_height / 2)
-                width = int(float_width)
-                height = int(float_height)
-
-                if opt.results and len(parts) >= 6:
-                    conf = float(parts[5])
-                    annotation = create_annotation_from_yolo_results_format(
-                        min_x, min_y, width, height, image_id, category_id, conf
-                    )
-                else:
-                    annotation = create_annotation_from_yolo_format(
-                        min_x, min_y, width, height, image_id, category_id, annotation_id,
-                        segmentation=opt.box2seg,
-                    )
+                annotation = create_annotation_from_yolo_format(
+                    x_min, y_min, int(abs_bw), int(abs_bh),
+                    image_id, class_id, annotation_id,
+                    segmentation=opt.box2seg,
+                )
                 annotations.append(annotation)
                 annotation_id += 1
 
@@ -87,36 +81,24 @@ def get_images_info_and_annotations(opt):
 
     return images_annotations, annotations
 
-
-def get_args():
-    parser = argparse.ArgumentParser("Yolo format annotations to COCO dataset format")
-    parser.add_argument("-p", "--path", type=str, required=True)
-    parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--output", default="train_coco.json", type=str)
-    parser.add_argument("--yolo-subdir", action="store_true")
-    parser.add_argument("--box2seg", action="store_true")
-    parser.add_argument("--results", action="store_true")
-    return parser.parse_args()
-
-
 def main(opt):
-    output_path = f"{opt.output}"
-    print("Start!")
     coco_format["images"], coco_format["annotations"] = get_images_info_and_annotations(opt)
 
-    for idx, label in enumerate(classes):
+    for idx, name in enumerate(classes):
         coco_format["categories"].append({
-            "supercategory": "Tree",
-            "id": idx + 1,
-            "name": label,
+            "id": idx,
+            "name": name,
+            "supercategory": "Tree"
         })
 
-    with open(output_path, "w") as f:
+    with open(opt.output, "w") as f:
         json.dump(coco_format, f, indent=4)
-
-    print(f"Finished! Output saved to {output_path}")
-
+    print("\nFinished writing:", opt.output)
 
 if __name__ == "__main__":
-    options = get_args()
-    main(options)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--path", required=True, help="Image directory path")
+    parser.add_argument("--output", default="train_coco.json", help="Output annotation file")
+    parser.add_argument("--box2seg", action="store_true", help="Use bbox to create segmentation")
+    args = parser.parse_args()
+    main(args)
