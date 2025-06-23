@@ -13,7 +13,7 @@ source ~/miniconda3/bin/activate
 ```
 ```bash
 conda init --all
-```
+```mk
 
 ### YOLO
 Refer to this [yolo_installation](/doc/yolo_installation.md)
@@ -23,11 +23,38 @@ Refer to this [mm_installation](/doc/mm_installation.md)
 ## Dataset
 Make sure git-lfs is installed (https://git-lfs.com)
 ```bash
+sudo apt install git-lfs
+```
+
+```bash
 git lfs install
 git clone https://huggingface.co/datasets/MinTR-KIEU/det_tree
 ```
 
+## Detection Task
+### Convert YOLO Dataset to COCO Annotation
+
+Prepare your dataset directory with the following structure for both `train` and `val` splits:
+```
+root/
+    ├── 00001.txt
+    └── 00001.png
+```
+
+To convert the YOLO-format dataset to COCO annotation format, run:
+```bash
+python tools/yolo_to_coco_converter.py --train <path_to_train_folder> --val <path_to_val_folder> --out <path_to_output_json>
+```
+
+
+
+
+## Segmentation Task
 ### Convert masks to YOLO txt
+Require imagesize
+```bash
+pip install imagesize
+```
 ```bash
 python tools/convert_yolo_masks <your_dataset_root_dir>
 ```

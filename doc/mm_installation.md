@@ -22,6 +22,7 @@ pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2
 
 ## MMDetection
 ```bash
+git clone https://github.com/MT121201/mmdetection.git
 cd mmdetection
 pip install -v -e .
 # "-v" means verbose, or more output
