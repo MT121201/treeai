@@ -43,7 +43,7 @@ This is the latest stable NumPy 1.x version that's compatible with:
 - MMCV full 2.x
 - MMDetection 3.3.0
 
-## Verify the installation
+### Verify the installation
 We need to download config and checkpoint files.
 ```bash
 mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest .
@@ -52,4 +52,27 @@ mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest .
 Verify the inference demo.
 ```bash
 python demo/image_demo.py demo/demo.jpg rtmdet_tiny_8xb32-300e_coco.py --weights rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth --device cpu
+```
+
+## MMSegmentation
+```bash
+git clone https://github.com/MT121201/mmsegmentation.git
+cd mmsegmentation/
+pip install -v -e .
+pip install ftfy 
+pip install regex
+
+# '-v' means verbose, or more output
+# '-e' means installing a project in editable mode,
+# thus any local modifications made to the code will take effect without reinstallation.
+```
+### Verify the installation
+We need to download config and checkpoint files.
+```bash
+mim download mmsegmentation --config pspnet_r50-d8_4xb2-40k_cityscapes-512x1024 --dest .
+```
+
+Verify the inference demo.
+```bash
+python demo/image_demo.py demo/demo.png configs/pspnet/pspnet_r50-d8_4xb2-40k_cityscapes-512x1024.py pspnet_r50-d8_512x1024_40k_cityscapes_20200605_003338-2966598c.pth --device cuda:0 --out-file result.jpg
 ```

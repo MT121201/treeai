@@ -4,3 +4,6 @@
 [submodule "extern/mmsegmentation"]
 	path = extern/mmsegmentation
 	url = https://github.com/MT121201/mmsegmentation.git
+[submodule "mmsegmentation"]
+	path = mmsegmentation
+	url = https://github.com/MT121201/mmsegmentation.git
