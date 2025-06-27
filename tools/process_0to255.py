@@ -15,12 +15,12 @@ def convert_zeros_to_ignore(src_dir, dst_dir):
         label = np.array(Image.open(src_path))
 
         # Replace 0 with 255
-        label[label == 0] = 255
+        label[label == 0] = 62
 
         Image.fromarray(label.astype(np.uint8)).save(dst_path)
 
     print(f"Converted all 0s to 255 in: {src_dir} → {dst_dir}")
 
 # === Example Usage ===
-convert_zeros_to_ignore("/home/a3ilab01/treeai/det_tree/segmentation/34_RGB_SemSegm_640_pL/unprocessd_annotations/val", 
-"/home/a3ilab01/treeai/det_tree/segmentation/34_RGB_SemSegm_640_pL/annotations/val")
+convert_zeros_to_ignore("/home/a3ilab01/treeai/dataset/segmentation/full/annotations_0/train", 
+"/home/a3ilab01/treeai/dataset/segmentation/full/annotations_63/train")

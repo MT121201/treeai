@@ -12,9 +12,12 @@ def scan_label_indices(label_dir):
         if not fname.endswith('.png'):
             continue
         path = os.path.join(label_dir, fname)
-        mask = np.array(Image.open(path))
+        try:
+            mask = np.array(Image.open(path))
+        except Exception as e:
+            print(f"⚠️ Failed to read {fname}: {e}")
+            continue
 
-        # Flatten and count all unique pixel values
         flat = mask.flatten()
         values, counts = np.unique(flat, return_counts=True)
 
@@ -22,9 +25,9 @@ def scan_label_indices(label_dir):
         value_counts.update(dict(zip(values, counts)))
         total_files += 1
 
-    print(f"Scanned {total_files} files in: {label_dir}")
-    print(f"Unique label values found: {sorted(unique_values)}")
-    print(f"Total classes: {len(unique_values)}")
+    print(f"\n📁 Scanned {total_files} files in: {label_dir}")
+    print(f"📊 Unique label values found: {sorted(unique_values)}")
+    print(f"🧮 Total classes used: {len(unique_values)}")
 
     if 0 in unique_values:
         print("⚠️ Class 0 is used (commonly background).")
@@ -36,12 +39,12 @@ def scan_label_indices(label_dir):
     else:
         print("⚠️ Class 255 not used (ignored regions missing?).")
 
-    print("\nTop 10 most frequent class IDs:")
-    for val, cnt in value_counts.most_common(10):
-        print(f"Class {val}: {cnt} pixels")
+    print("\n🔥 Frequent class pixel counts:")
+    for val, cnt in sorted(value_counts.items(), key=lambda x: x[1], reverse=True):
+        print(f"  Class {val:3d}: {cnt:,} pixels")
 
-    return unique_values, value_counts
+    return sorted(unique_values), value_counts
 
 # Example usage:
-label_path = '/home/a3ilab01/treeai/det_tree/segmentation/34_RGB_SemSegm_640_pL/annotations/train'  # <-- change to your folder
+label_path = '/home/a3ilab01/treeai/dataset/segmentation/full/annotations_0/train'
 scan_label_indices(label_path)
