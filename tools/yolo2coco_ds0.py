@@ -9,7 +9,7 @@ from create_annotations import (
 
 def get_annotations(image_dir, box2seg=False):
     # Use 1-based class IDs directly
-    class_map = {1: 2, 2: 5}  # 1 → Picea abies 2, 2 → Pinus sylvestris 5
+    class_map = {1: 2, 2: 5, 3:4}  # 1 → Picea abies 2, 2 → Pinus sylvestris 5
     image_dir = Path(image_dir)
     annotations = []
     images_annotations = []

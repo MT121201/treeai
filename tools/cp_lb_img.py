@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 
 # Define root paths
-root = Path('/home/a3ilab01/treeai/dataset/12_RGB_ObjDet_640_fL')
+root = Path('/home/a3ilab01/treeai/dataset/x/0_RGB_include_3/coco')
 label_dirs = [root / 'labels/train', root / 'labels/val']
 image_dirs = [root / 'images/train', root / 'images/val']
 
