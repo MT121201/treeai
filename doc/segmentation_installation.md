@@ -1,7 +1,3 @@
-Here is a **refactored and cleaner version** of your installation guide for MMSegmentation:
-
----
-
 # 🧠 MMSegmentation Setup Guide (CUDA 11.8 + PyTorch 2.1)
 
 ## 🐍 Step 1: Install MiniConda
