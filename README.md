@@ -11,7 +11,7 @@ Here is a **cleaned-up and well-formatted version** of your TreeAI solution inst
 ### 🛠️ Installation
 
 Please refer to the full installation guide:
-📄 [`detection_installation.md`](/home/a3ilab01/treeai/doc/detection_installation.md)
+📄 [`detection_installation.md`](doc/detection_installation.md)
 
 ---
 
@@ -59,7 +59,7 @@ bash tools/dist_train.sh configs/_custom_/finetune_12.py 2
 ### 🛠️ Installation
 
 Please refer to the full installation guide:
-📄 [`segmentation_installation.md`](/home/a3ilab01/treeai/doc/segmentation_installation.md)
+📄 [`segmentation_installation.md`](doc/segmentation_installation.md)
 
 ---
 
