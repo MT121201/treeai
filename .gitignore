@@ -2,6 +2,11 @@ det_tree/
 dataset/
 runs/
 tmp_vis/
+__MACOSX/
+SemSeg_test-images/
+12_RGB_ObjDet_640_fL_test_images.zip
+SemSeg_test-images.zip
+images/
 # Ignore Python cache and virtual environment
 __pycache__/
 *.pyc

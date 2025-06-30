@@ -1,79 +1,101 @@
-# Solution for TreeAI Global Initiative
+Here is a **cleaned-up and well-formatted version** of your TreeAI solution instructions for both Detection and Segmentation:
 
-## Installation
-### MiniConda
-```bash
-mkdir -p ~/miniconda3
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-```
-```bash
-source ~/miniconda3/bin/activate
-```
-```bash
-conda init --all
-```mk
+---
 
-### YOLO
-Refer to this [yolo_installation](/doc/yolo_installation.md)
+# 🌳 TreeAI Global Initiative: Solution Guide
 
-### mm
-Refer to this [mm_installation](/doc/mm_installation.md)
-## Dataset
-Make sure git-lfs is installed (https://git-lfs.com)
-```bash
-sudo apt install git-lfs
-```
+---
+
+## 🧭 Detection Task
+
+### 🛠️ Installation
+
+Please refer to the full installation guide:
+📄 [`detection_installation.md`](/home/a3ilab01/treeai/doc/detection_installation.md)
+
+---
+
+### 🚀 Inference
+
+Make sure you're inside the `mmdetection` directory:
 
 ```bash
-git lfs install
-git clone https://huggingface.co/datasets/MinTR-KIEU/det_tree
+cd mmdetection/
 ```
 
-## Detection Task
-### Convert YOLO Dataset to COCO Annotation
+Optional: Download pretrained weights for faster inference:
 
-Prepare your dataset directory with the following structure for both `train` and `val` splits:
-```
-root/
-    ├── 00001.txt
-    └── 00001.png
-```
-
-To convert the YOLO-format dataset to COCO annotation format, run:
 ```bash
-python tools/yolo_to_coco_converter.py --train <path_to_train_folder> --val <path_to_val_folder> --out <path_to_output_json>
+mkdir -p weights && \
+wget -O weights/multiscale_12.pth https://huggingface.co/datasets/MinTR-KIEU/det_tree/resolve/main/weights/multiscale_12.pth
 ```
 
+Run prediction:
 
-
-
-## Segmentation Task
-### Convert masks to YOLO txt
-Require imagesize
 ```bash
-pip install imagesize
-```
-```bash
-python tools/convert_yolo_masks <your_dataset_root_dir>
+python tools/prediction.py --test_dir <path_to_test_images>
 ```
 
-### Visualize txt label
+---
+
+### 🏋️ Training
+
+Use the distributed training script:
+
 ```bash
-python python tools/visuallize_seg_label.py <path to choosen image>
+bash tools/dist_train.sh <path_to_config> <num_gpus>
 ```
 
-### Merge dataset for training (Only if all correct YOLO dataset structure)
-Only support correct YOLO dataset structure, if not please check `scripts/format.sh`
-Please check class ID before merge
-Please edit dataset path in code file before run
+📌 Example:
+
 ```bash
-python tools/merge_dataset.py 
+bash tools/dist_train.sh configs/_custom_/finetune_12.py 2
 ```
 
-## Training
-### Segmetation Model
+---
+
+## 🎨 Segmentation Task
+
+### 🛠️ Installation
+
+Please refer to the full installation guide:
+📄 [`segmentation_installation.md`](/home/a3ilab01/treeai/doc/segmentation_installation.md)
+
+---
+
+### 🚀 Inference
+
+Make sure you're inside the `mmsegmentation` directory:
+
 ```bash
-conda activate yolo11
+cd mmsegmentation/
+```
+
+Optional: Download pretrained weights:
+
+```bash
+mkdir -p weights && \
+wget -O weights/seg_37.pth https://huggingface.co/datasets/MinTR-KIEU/det_tree/resolve/main/weights/seg_37.pth
+```
+
+Run prediction:
+
+```bash
+python tools/test_npy.py --test_dir <path_to_test_images>
+```
+
+---
+
+### 🏋️ Training
+
+Use the distributed training script:
+
+```bash
+bash tools/dist_train.sh <path_to_config> <num_gpus>
+```
+
+📌 Example:
+
+```bash
+bash tools/dist_train.sh configs/_custom_/segformer2.py 2
 ```
